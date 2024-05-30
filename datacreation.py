@@ -3,8 +3,8 @@ import pandas as pd
 import os
 
 # Создание директорий train и test
-os.makedirs("train", existok=True)
-os.makedirs("test", existok=True)
+os.makedirs("train", exist_ok=True)
+os.makedirs("test", exist_ok=True)
 
 
 # Функция для создания набора данных
@@ -20,6 +20,6 @@ traindf = createdataset(1000, noise=True)
 testdfnormal = createdataset(300)
 testdfanomalies = createdataset(300, noise=True)
 
-traindf.tocsv("train/traindata.csv", index=False)
-testdfnormal.tocsv("test/testdata.csv", index=False)
-testdfanomalies.tocsv("test/testdatawithnoise.csv", index=False)
+traindf.to_csv("train/train_data.csv", index=False)
+testdfnormal.to_csv("test/test_data.csv", index=False)
+testdfanomalies.to_csv("test/test_data_with_noise.csv", index=False)

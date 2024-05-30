@@ -1,9 +1,9 @@
 import pandas as pd
-from sklearn.linearmodel import LinearRegression
+from sklearn.linear_model import LinearRegression
 import joblib
 
 # Загрузка данных
-traindf = pd.readcsv("train/traindataprocessed.csv")
+traindf = pd.read_csv("train/train_data_processed.csv")
 
 # Тренировка модели
 Xtrain = traindf[["x"]]
