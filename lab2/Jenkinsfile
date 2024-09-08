@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Download Data') {
+            steps {
+                script {
+                    // Удаление всех файлов и папок, кроме lab2
+                    sh 'cd /var/lib/jenkins/workspace/Jenkins_lab2 && find . -mindepth 1 -maxdepth 1 ! -name lab2 -exec rm -rf {} +'
+                }
+            }
+        }
+
+
+        stage('Data Creation') {
+            steps {
+                script {
+                    // Запуск скрипта
+                    echo "----Data Creation (begin)-----"
+                    sh 'python3 /var/lib/jenkins/workspace/Jenkins_lab2/lab2/data_creation.py'
+                    echo "----Data Creation (end)-----"
+                }
+            }
+        }
+        stage('Data Preprocessing') {
+            steps {
+                script {
+                    // Запуск скрипта
+                    echo "----Data Preprocessing (begin)-----"
+                    sh 'python3 /var/lib/jenkins/workspace/Jenkins_lab2/lab2/data_preprocessing.py'
+                    echo "----Data Preprocessing (end)-----"
+                }
+            }
+        }
+        stage('Model Preparation') {
+            steps {
+                script {
+                    // Запуск скрипта
+                    echo "----Model Preparation (begin)-----"
+                    sh 'python3 /var/lib/jenkins/workspace/Jenkins_lab2/lab2/model_preparation.py'
+                    echo "----Model Preparation (end)-----"
+                }
+            }
+        }
+        stage('Model Testing') {
+            steps {
+                script {
+                    // Запуск скрипта
+                    echo "----Model Testing (begin)-----"
+                    sh 'python3 /var/lib/jenkins/workspace/Jenkins_lab2/lab2/model_testing.py'
+                    echo "----Model Testing (end)-----"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,144 @@
+Практическое задание № 4
+
+
+
+1-ый шаг: Создаём рабочую директорию «DVC», а в ней папку «lab4»
+
+    В терминале Ubuntu выполняем следующие команды: 
+       
+        mkdir DVC
+        cd DVC
+        mkdir lab4
+
+
+
+2-ой шаг: Устанавливаем Git и DVC, настраиваем проект
+
+
+    1. Устанавливаем Git : 
+       
+        sudo apt update
+        sudo apt install git
+
+    2. Устанавливаем DVC : 
+       
+        sudo apt update
+        sudo apt install python3-pip
+        pip3 install dvc
+
+    3. Производим инициализацию Git и DVC :
+       
+        git init
+        dvc init
+       
+    4. Сохраняем директорию со служебными файлами в Git:
+       
+        git commit -m „Init dvc“
+       
+    5. Начинаем отслеживание папки «lab4»:
+       
+        dvc add lab4
+        dvc config core.autostage true
+       
+    6. Добавляем в Git файл .gitignore, который содержит информацию о том, чего не должно быть в Git репозитории, а также файл lab4.dvc
+       
+        git add .gitignore lab4.dvc
+        git commit -m „Put lab4 under control“
+
+
+
+3-ий шаг: Реализуем настройку удаленного хранилища
+
+
+       Для Google Drive:
+    1. Создаём папку в Google Drive для нашего проекта.
+    2. Устанавливаем статус пользователя, использующего ссылку, на уровень «Редактор»
+    3. Получаем ID папки (в URL папки на Google Drive).
+    4. Настраиваем удаленное хранилище DVC:
+       dvc remote add -d myremote gdrive://1QegSImF4qYZpBnK84aqAWIgu7ahHGHWE
+
+
+
+4-ый шаг: Создаём и модифицируем датасет
+
+
+    1. Находим файл «titanic.csv» и копируем его raw ссылку
+       
+    2. Затем используем Python для его модификации (я в данном случае произвожу операции на Jupyter Notebook). Создаём в папке «DVC» блокнот под названием: «lab4», модифицируем датасет:
+       
+import pandas as pd
+
+# Загрузка датасета
+url = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv'
+titanic_data = pd.read_csv(url)
+
+# Оставляем только нужные столбцы
+titanic_data = titanic_data[['Pclass', 'Sex', 'Age']]
+
+# Сохраняем модифицированный датасет
+titanic_data.to_csv('lab4/titanic_modified.csv', index=False)
+       
+       
+       
+    3. Сохраняем изменения в Git и DVC: 
+       
+        git add lab4/titanic_modified.csv
+        git commit -m "Initial titanic dataset with selected columns"
+        dvc add lab4/titanic_modified.csv
+        git commit -m "Add data tracking for titanic dataset"
+        dvc push
+
+
+       
+
+5-ый шаг: Создаём новую версию датасета
+
+    1. Изменяем датасет в Python, заполнив пропущенные значения: 
+       
+titanic_data['Age'].fillna(round(titanic_data['Age'].mean()), inplace=True)
+titanic_data.to_csv('lab4/titanic_modified.csv', index=False)
+       
+    2. Снова сохраняем изменения в Git и DVC: 
+       
+        git add lab4/titanic_modified.csv
+        git commit -m "Fill missing age values"
+        dvc add lab4/titanic_modified.csv
+        git commit -m "Update data tracking with filled ages"
+        dvc push
+
+
+
+6-ой шаг: Добавляем новый признак в датасет
+
+    1. Изменяем датасет в Python, добавив one-hot-encoding для признака «Sex»:
+       
+titanic_data = pd.concat([titanic_data, pd.get_dummies(titanic_data['Sex'], prefix='Sex')], axis=1)
+titanic_data.drop('Sex', axis=1, inplace=True)
+titanic_data.to_csv('lab4/titanic_modified.csv', index=False)
+
+    2. Снова сохраняем изменения в Git и DVC:
+       
+        git add lab4/titanic_modified.csv
+        git commit -m "Add one-hot encoding for sex"
+        dvc add lab4/titanic_modified.csv
+        git commit -m "Update data tracking with one-hot encoding"
+        dvc push
+
+
+
+7-ой шаг: Переключение между версиями
+
+       
+    1. С помощью команды «git log --oneline» мы можем посмотреть список версий нашего датасета. В нашем случае это выглядит следующим образом:
+       
+       6982eee (HEAD → master) Update data tracking with one-hot encoding
+       1ade205 Update data tracking with filled ages
+       cd0ef67 Add data tracking for titanic dataset
+       fa67f61 Put lab4 under control
+       8352b9b Init dvc
+       Первые три (6982eee(master), 1ade205, cd0ef67) — это версии нашего датасета
+       
+    2. Для переключения между версиями используем «dvc checkout»:
+       
+       git checkout <версия>
+       dvc checkout
